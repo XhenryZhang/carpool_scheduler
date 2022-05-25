@@ -44,12 +44,13 @@ def main() -> None:
 
     # sanity checks
     sanity_check(input.config_info)
+    
     # convert specifications to a series of z3 constraints
 
     # run the solver
 
-    # display solver output
-
+    # display solver output, takes in solver output
+    display_sat()
 
 # add more methods for stretch goals to parse seating requeusts with specific individuals
 if __name__ == '__main__':

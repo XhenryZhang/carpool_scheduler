@@ -11,6 +11,7 @@ def cal_num_seats(config_info: dict) -> int:
     for car_type in config_info[input.CAR_DELIM]:
         if car_type >= 0 and car_type <= 2:
             ans += input.SEAT_COUNT[car_type]
+            input.NUM_CAR_TYPE[car_type] += 1
         else:
             raise IOError(f"Invalid car type specified in configuration file: {car_type}. Car type must be specified as 0, 1, or 2.")
 
@@ -45,10 +46,68 @@ def configure_solver(config_info: dict, cp_solver: Solver) -> None:
     cp_solver: z3 Solver object to construct with SMT formula
     rtype: None
     """
+    name_list = config_info[input.PEOPLE_LIST]
+    car_type_list = config_info[input.CAR_DELIM]
+    name_index = {name: index for index, name in enumerate(name_list)}
     # generate position variables: X_p_c_s (person p in car number c in seat type s)
-    X = [[[]]]
-    # encode constraint: one person in one type of seat on one car
-    cp_solver.add(x + 1 == 4)
+    X_p_c_s = [[[Int('X_%s_%s_%s' % (name, car_num, seat_type)) for seat_type in range(3)] for car_num in range(len(car_type_list))] for name in name_list]
+    # X_p_c_s[config_info[input.PEOPLE_LIST][0]][0][0] = X_mike_0_0
+    
+    # encode constraint: X_p_c_s == 1 or X_p_c_s == 0
+    # encode constraint: each person is seated in exactly one car
+    for name in name_list:
+        oc = IntVal(0)
+        for car_num in range(len(car_type_list)):
+            for seat_type in range(3):
+                oc = oc + X_p_c_s[name_index[name]][car_num][seat_type]
+                cp_solver.add(Or(X_p_c_s[name_index[name]][car_num][seat_type] == 0, X_p_c_s[name_index[name]][car_num][seat_type] == 1))
+        
+        cp_solver.add(oc == 1)
+    
+    # encode constraint: each car has a set number of free seats based on their type
+    for car_num in range(len(car_type_list)):
+        oc = IntVal(0)
+        for name in name_list:
+            for seat_type in range(3):
+                oc = oc + X_p_c_s[name_index[name]][car_num][seat_type]
+        
+        cp_solver.add(oc <= input.SEAT_COUNT[car_type_list[car_num]])
+
+    # encode constraint: quantity of each seat type is set based on the car types in configuration
+    for seat_type in range(3):
+        oc = IntVal(0)
+        for name in name_list:
+            for car_num in range(len(car_type_list)):
+                oc = oc + X_p_c_s[name_index[name]][car_num][seat_type]
+
+        # window
+        if seat_type == input.WINDOW:
+            cp_solver.add(oc <= 2 * input.NUM_CAR_TYPE[input.SEDAN] + 4 * input.NUM_CAR_TYPE[input.VAN])
+        # shotgun
+        elif seat_type == input.SHOTGUN:
+            total = input.NUM_CAR_TYPE[input.SEDAN] + input.NUM_CAR_TYPE[input.VAN] + input.NUM_CAR_TYPE[input.SPORTS]
+            assert(len(config_info[input.CAR_DELIM]) == total)
+            cp_solver.add(oc <= total)
+        # middle
+        elif seat_type == input.MIDDLE:
+            cp_solver.add(oc <= input.NUM_CAR_TYPE[input.SEDAN] + input.NUM_CAR_TYPE[input.VAN])
+
+    # encode constraint: seat type restrictions
+    for name in name_list:
+        oc = IntVal(0)
+        for car_num in range(len(car_type_list)):
+            for seat_restriction_type in config_info[name]:
+                oc = oc + X_p_c_s[name_index[name]][car_num][seat_restriction_type]
+        
+        cp_solver.add(oc == 0)
+
+        # create a backtracking point, in case peer constraints don't work out
+    cp_solver.push()
+
+def generate_output(config_info: dict, cp_solver: Solver) -> None:
+    # run the solver <<modify for both test cases>>.,
+    print(cp_solver.check())
+    m = cp_solver.model()
 
 def main() -> None:
     # gather user input
@@ -57,14 +116,13 @@ def main() -> None:
     sanity_check(input.config_info)
     
     # convert specifications to a series of z3 constraints
+    # z3.set_param('parallel.enable', True)
+    # z3.set_param('parallel.threads.max', 32)
     carpool_solver = Solver()
     configure_solver(input.config_info, carpool_solver)
-    # run the solver
-    print(carpool_solver.check())
-    print(carpool_solver.model())
 
-    # display solver output, takes in solver output
-    display_sat()
+    # run solver and generate
+    generate_output(input.config_info, carpool_solver)
 
 # add more methods for stretch goals to parse seating requeusts with specific individuals
 if __name__ == '__main__':

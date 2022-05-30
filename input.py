@@ -1,14 +1,24 @@
 import os, sys
 
-SEDAN = 0
+SEDAN = 0 # corresponds to index in SEAT_COUNT and NUM_CAR_TYPE array for this variable's car type
 SPORTS = 1
 VAN = 2
+WINDOW = 0
+SHOTGUN = 1
+MIDDLE = 2
+
 CAR_DELIM = "CARS"
 SEAT_DELIM = "SEATS"
 SEAT_END_DELIM = "END_SEAT"
+AVOID_DELIM = "AVOID"
+AVOID_END_DELIM = "END_AVOID"
 NUM_PEOPLE = "NUM_PEOPLE"
 PEOPLE_LIST = "NAMES"
 SEAT_COUNT = [4, 1, 6]
+NUM_CAR_TYPE = [0, 0, 0]
+
+CONFIG_FOLDER = "configs"
+SOLUTION_FOLDER = "solutions"
 
 config_info = {}
 
@@ -54,21 +64,26 @@ def get_seat_requirements(path: str) -> None:
 
         while seat_config and (seat_config != f"{SEAT_END_DELIM}\n" and seat_config != SEAT_END_DELIM):
             seat_config = seat_config.strip()
-            seat_config_arr = seat_config.split(" ")
-
-            name = seat_config_arr[0]
-            config_info[PEOPLE_LIST].append(name)
-            seat_config_arr = seat_config_arr[1:]
             
-            # convert to integers and save into configuration dictonary
-            seat_config_arr = [int(elem) for elem in seat_config_arr]
+            # prevent empty string from being counted as a constraint
+            if len(seat_config) != 0:
+                seat_config_arr = seat_config.split(" ")
 
-            if name in config_info:
-                raise ValueError("Repeated name in input file.")
+                name = seat_config_arr[0].lower()
+                config_info[PEOPLE_LIST].append(name)
+                seat_config_arr = seat_config_arr[1:]
+                
+                # convert to integers and save into configuration dictonary
+                seat_config_arr = [int(elem) for elem in seat_config_arr]
 
-            config_info[name] = seat_config_arr
+                if name in config_info:
+                    raise ValueError("Repeated name in input file.")
+
+                config_info[name] = seat_config_arr
+                elems_added += 1
+
             seat_config = in_file.readline()
-            elems_added += 1
+            
 
     config_info[NUM_PEOPLE] = elems_added
     if elems_added == 0:
@@ -76,12 +91,12 @@ def get_seat_requirements(path: str) -> None:
 
 def main() -> None:
     f_name = input("Enter the name of the desired configuration file from the config folder: ")
-    input_file_name = os.path.join("configs", f_name)
+    input_file_name = os.path.join(CONFIG_FOLDER, f_name)
     path = os.path.join(sys.path[0], input_file_name)
     get_car_types(path)
     get_seat_requirements(path)
     
-    print(config_info)
+    # print(config_info)
     
 # add more methods for stretch goals to parse seating requeusts with specific individuals
 if __name__ == '__main__':

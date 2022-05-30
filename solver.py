@@ -55,6 +55,7 @@ def main() -> None:
     input.main()
     # sanity checks
     sanity_check(input.config_info)
+    
     # convert specifications to a series of z3 constraints
     carpool_solver = Solver()
     configure_solver(input.config_info, carpool_solver)
@@ -62,8 +63,8 @@ def main() -> None:
     print(carpool_solver.check())
     print(carpool_solver.model())
 
-    # display solver output
-
+    # display solver output, takes in solver output
+    display_sat()
 
 # add more methods for stretch goals to parse seating requeusts with specific individuals
 if __name__ == '__main__':

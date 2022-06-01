@@ -1,11 +1,11 @@
 CARS
-2 1
+2
 
 SEATS
-mike 0 2
+mike
 bob 1 2
 jesus 1 2
 tom 1 2
-nancy 0 2
+nancy 1
 richard 1 2
 END_SEAT

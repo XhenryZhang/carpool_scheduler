@@ -1,12 +1,25 @@
 import os, sys
 
-SEDAN = 0 # corresponds to index in SEAT_COUNT and NUM_CAR_TYPE array for this variable's car type
+# ---- ADD YOUR OWN CAR BUILDS ----
+CAR_TYPES = ['Sedan', 'Sports Car', 'Van']
+SEDAN = 0 
 SPORTS = 1
 VAN = 2
+
+# ---- ADD YOUR OWN SEAT TYPES ----
+SEAT_TYPES = ['Window', 'Shotgun', 'Middle']
 WINDOW = 0
 SHOTGUN = 1
 MIDDLE = 2
 
+# ---- CHANGE BASED ON YOUR CAR BUILDS and SEAT TYPES ----
+# SEAT_COUNTS[car_build][seat_type] = total number of seats of seat_type on car_build
+SEAT_COUNTS = [[2, 1, 1], [0, 1, 0], [4, 1, 1]]
+
+# ---- DETERMINES INPUT DIRECTORY FOR CONFIGURATION FILES ----
+CONFIG_FOLDER = "configs"
+
+# ==== CONSTANTS USED TO PARSE CONFIGURATION FILES ====
 CAR_DELIM = "CARS"
 SEAT_DELIM = "SEATS"
 SEAT_END_DELIM = "END_SEAT"
@@ -14,17 +27,14 @@ AVOID_DELIM = "AVOID"
 AVOID_END_DELIM = "END_AVOID"
 NUM_PEOPLE = "NUM_PEOPLE"
 PEOPLE_LIST = "NAMES"
-SEAT_COUNT = [4, 1, 6]
-NUM_CAR_TYPE = [0, 0, 0]
 
-CONFIG_FOLDER = "configs"
-SOLUTION_FOLDER = "solutions"
-
+target_file = ""
+num_car_type = [0, 0, 0]
 config_info = {}
 
 def get_car_types(path: str) -> None:
     """
-    Parses configuration file and extracts car types
+    Parses configuration file and extracts car build types
     path: path to input configuration file
     rtype: None 
     """
@@ -90,12 +100,18 @@ def get_seat_requirements(path: str) -> None:
         raise IOError(f"No seat data found.")
 
 def main() -> None:
-    f_name = input("Enter the name of the desired configuration file from the config folder: ")
+    global target_file
+    assert len(SEAT_COUNTS) > 0
+    assert len(SEAT_COUNTS[0]) == len(SEAT_TYPES)
+    assert len(SEAT_COUNTS) == len(CAR_TYPES)
+
+    f_name = input(f"Enter the name of the desired configuration file from the {CONFIG_FOLDER} folder: ")
     input_file_name = os.path.join(CONFIG_FOLDER, f_name)
     path = os.path.join(sys.path[0], input_file_name)
+    target_file = f_name
     get_car_types(path)
     get_seat_requirements(path)
-    
+
     # print(config_info)
     
 # add more methods for stretch goals to parse seating requeusts with specific individuals

@@ -143,6 +143,22 @@ def get_avoid_requirements(path: str) -> None:
 
                 avoid_config = in_file.readline()
 
+def extract_config(f_name: str) -> None:
+    global target_file, num_car_type, config_info
+    assert len(SEAT_COUNTS) > 0
+    assert len(SEAT_COUNTS[0]) == len(SEAT_TYPES)
+    assert len(SEAT_COUNTS) == len(CAR_TYPES)
+
+    num_car_type = [0, 0, 0]
+    config_info = {}
+    
+    input_file_name = os.path.join(CONFIG_FOLDER, f_name)
+    path = os.path.join(sys.path[0], input_file_name)
+    target_file = f_name
+    get_car_types(path)
+    get_seat_requirements(path)
+    get_avoid_requirements(path)
+    
 def main() -> None:
     global target_file
     assert len(SEAT_COUNTS) > 0
@@ -150,14 +166,7 @@ def main() -> None:
     assert len(SEAT_COUNTS) == len(CAR_TYPES)
 
     f_name = input(f"Enter the name of the desired configuration file from the {CONFIG_FOLDER} folder: ")
-    input_file_name = os.path.join(CONFIG_FOLDER, f_name)
-    path = os.path.join(sys.path[0], input_file_name)
-    target_file = f_name
-    get_car_types(path)
-    get_seat_requirements(path)
-    get_avoid_requirements(path)
-
-    #print(config_info)
+    extract_config(f_name)
     
 # add more methods for stretch goals to parse seating requeusts with specific individuals
 if __name__ == '__main__':

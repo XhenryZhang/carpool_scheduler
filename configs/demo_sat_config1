@@ -1,0 +1,13 @@
+--- test assignment over multiple cars ---
+
+CARS
+2 1
+
+SEATS
+mike 0 2
+bob 1 2
+jesus 1 2
+tom 1 2
+nancy 0 2
+richard 1 2
+END_SEAT

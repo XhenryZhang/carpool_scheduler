@@ -1,5 +1,7 @@
+--- basic unsat assignment ---
+
 CARS
-2 1
+2
 
 SEATS
 mike 0 2

@@ -94,10 +94,54 @@ def get_seat_requirements(path: str) -> None:
 
             seat_config = in_file.readline()
             
-
     config_info[NUM_PEOPLE] = elems_added
     if elems_added == 0:
         raise IOError(f"No seat data found.")
+
+def get_avoid_requirements(path: str) -> None:
+    """
+    Parses configuration file and extracts interpersonal seating preferences
+    path: path to input configuration file
+    rtype: None
+    """
+    config_info[AVOID_DELIM] = {}
+    with open(path, "r") as in_file:
+        cur_str = in_file.readline()
+        
+        while cur_str and cur_str != f"{AVOID_DELIM}\n":
+            cur_str = in_file.readline()
+
+        if cur_str:
+            avoid_config = in_file.readline()
+
+            while avoid_config and (avoid_config != f"{AVOID_END_DELIM}\n" and avoid_config != AVOID_END_DELIM):
+                avoid_config = avoid_config.strip()
+                
+                # prevent empty string from being counted as a constraint
+                if len(avoid_config) != 0:
+                    avoid_config_arr = avoid_config.split(" ")
+
+                    name = avoid_config_arr[0].lower()
+
+                    # check if name doesn't exist
+                    if name not in config_info[PEOPLE_LIST]:
+                        raise ValueError(f"Unknown name of person to avoid: {name}")
+
+                    avoid_config_arr = avoid_config_arr[1:]
+
+                    # convert to integers and save into configuration dictonary
+                    for person_to_avoid in avoid_config_arr:
+                        if person_to_avoid in config_info[PEOPLE_LIST]:
+                            if person_to_avoid == name:
+                                raise ValueError(f"Can't specify the rider's name as the person to avoid: {name}")
+                            elif name in config_info[AVOID_DELIM]:
+                                config_info[AVOID_DELIM][name].append(person_to_avoid)
+                            else:
+                                config_info[AVOID_DELIM][name] = [person_to_avoid]
+                        else:
+                            raise ValueError(f"Unknown name of person to avoid: {person_to_avoid}")
+
+                avoid_config = in_file.readline()
 
 def main() -> None:
     global target_file
@@ -111,8 +155,9 @@ def main() -> None:
     target_file = f_name
     get_car_types(path)
     get_seat_requirements(path)
+    get_avoid_requirements(path)
 
-    # print(config_info)
+    #print(config_info)
     
 # add more methods for stretch goals to parse seating requeusts with specific individuals
 if __name__ == '__main__':

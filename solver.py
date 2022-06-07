@@ -47,6 +47,8 @@ def configure_solver(config_info: dict, cp_solver: Solver) -> None:
     """
     name_list = config_info[input.PEOPLE_LIST]
     car_type_list = config_info[input.CAR_DELIM]
+    avoid_dict = config_info[input.AVOID_DELIM]
+
     name_index = {name: index for index, name in enumerate(name_list)}
     # generate position variables: X_p_c_s (person p in car number c in seat type s)
     X_p_c_s = [[[Int('X_%s_%s_%s' % (name, car_num, seat_type)) for seat_type in range(3)] for car_num in range(len(car_type_list))] for name in name_list]
@@ -106,6 +108,15 @@ def configure_solver(config_info: dict, cp_solver: Solver) -> None:
     cp_solver.push()
 
     # encode constraint: riders avoiding other riders
+    for name in avoid_dict:
+        # for each person to avoid
+        for car_num in range(len(car_type_list)):
+            for person_to_avoid in avoid_dict[name]:
+                oc = IntVal(0)
+                for seat_type in range(len(input.SEAT_TYPES)):
+                    oc = oc + X_p_c_s[name_index[name]][car_num][seat_type] + X_p_c_s[name_index[person_to_avoid]][car_num][seat_type]
+
+                cp_solver.add(oc <= 1)
 
 def extract_seat_info(config_info: dict, cp_solver: Solver) -> dict:
     """
@@ -127,9 +138,10 @@ def extract_seat_info(config_info: dict, cp_solver: Solver) -> dict:
                     ans[int(coords[2])].append((coords[1], coords[3]))
                 else:
                     ans[int(coords[2])] = [(coords[1], coords[3])]
-
-        # add mapping for car types for each car
     else:
+        cp_solver.pop()
+
+        # TODO: catch z3 error and print unsat
         print('unsat')
 
     return ans

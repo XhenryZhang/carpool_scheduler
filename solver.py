@@ -104,7 +104,7 @@ def configure_solver(config_info: dict, cp_solver: Solver) -> None:
         
         cp_solver.add(oc == 0)
 
-        # create a backtracking point, in case peer constraints don't work out
+    # create a backtracking point, in case peer constraints don't work out
     cp_solver.push()
 
     # encode constraint: riders avoiding other riders
@@ -118,7 +118,7 @@ def configure_solver(config_info: dict, cp_solver: Solver) -> None:
 
                 cp_solver.add(oc <= 1)
 
-def extract_seat_info(config_info: dict, cp_solver: Solver) -> dict:
+def extract_seat_info(cp_solver: Solver, benchmark: bool = False) -> dict:
     """
     Generates the output file with the solution to the carpool scheduling problem.
     config_info: configuration information
@@ -141,10 +141,13 @@ def extract_seat_info(config_info: dict, cp_solver: Solver) -> dict:
     else:
         cp_solver.pop()
 
-        # TODO: catch z3 error and print unsat
+        # TODO: recursively execute
         print('unsat')
 
-    return ans
+    if benchmark:
+        print(cp_solver.statistics())
+
+    return ans, cp_solver.statistics()
 
 def main() -> None:
     # gather user input
@@ -157,7 +160,7 @@ def main() -> None:
     configure_solver(input.config_info, carpool_solver)
 
     # run solver and extract answers
-    ans = extract_seat_info(input.config_info, carpool_solver)
+    ans = extract_seat_info(carpool_solver)[0]
 
     # generate output
     output.generate_output(ans)

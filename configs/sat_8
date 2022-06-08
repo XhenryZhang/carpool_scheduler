@@ -1,0 +1,13 @@
+-- 10 seat constraints, 45 cars --
+CARS
+0 0 0 2 1 1 2 2 0 0 0 0
+
+
+SEATS
+james 0 2
+michael 0 2
+robert 0 2
+john 0 1
+david 1
+william 2
+END_SEAT

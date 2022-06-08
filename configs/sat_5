@@ -1,6 +1,6 @@
+-- 39 seat constraints, 12 cars --
 CARS
-0 0 0 2 1 1 2 2 0 0 0 0 0 0 0 2 1 1 2 2 0 0 0 0 0 0 0 2 1 1 2 2 0 0 0 0 0 0 0 2 1 1 2 2 0 0 0 0
-
+0 0 0 2 1 1 2 2 0 0 0 0
 
 SEATS
 james 0 2
@@ -32,23 +32,4 @@ linda 0 2
 ptricia 1
 susan 1
 barbara 1
-debra 0 1
-karen 0 2
-nancy 0 2
-donna 2
-cynthia 0 2
-sandra 2
-pamela 0 1
-sharon 0 1
-kathleen 2
-carol 2
-diane 0 1
-brenda 0 1
-cheryl 2
-janet 0 1
-elizabeth
-kathy 2
-margaret 2 
-janic 2
-carolyn 1
 END_SEAT

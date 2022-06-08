@@ -1,0 +1,28 @@
+-- 16 seat constraints, 45 avoid constraints, 12 cars --
+CARS
+0 0 0 2 1 1 2 2 0 0 0 0
+
+SEATS
+james 0 2
+michael 0 2
+robert 0 2
+john 0 1
+david 1
+william 2
+richard 1
+thomas 0 2
+mark 0 1
+charles 0
+END_SEAT
+
+AVOID
+james michael robert john david william richard thomas mark charles
+michael robert john david william richard thomas mark charles
+robert john david william richard thomas mark charles
+john david william richard thomas mark charles
+david william richard thomas mark charles
+william richard thomas mark charles
+richard thomas mark charles
+thomas mark charles
+mark charles
+END_AVOID
